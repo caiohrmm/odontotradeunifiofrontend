@@ -1,19 +1,54 @@
-import { Button } from "@workspace/ui/components/button"
+import { listingsApi, categoriesApi } from "@/lib/api"
+import { ListingCard } from "@/components/listing-card"
+import { ListingFilters } from "@/components/listing-filters"
+import { ListingsPagination } from "@/components/listings-pagination"
 
-export default function Page() {
+type SearchParams = Promise<{
+  search?: string
+  categoryId?: string
+  page?: string
+}>
+
+export default async function HomePage({
+  searchParams,
+}: {
+  searchParams: SearchParams
+}) {
+  const { search, categoryId, page } = await searchParams
+
+  const [listingsResult, categories] = await Promise.all([
+    listingsApi.list({
+      status: "ACTIVE",
+      search,
+      categoryId,
+      page: page ? Number(page) : 0,
+      size: 20,
+    }),
+    categoriesApi.list(),
+  ])
+
   return (
-    <div className="flex min-h-svh p-6">
-      <div className="flex max-w-md min-w-0 flex-col gap-4 text-sm leading-loose">
-        <div>
-          <h1 className="font-medium">Project ready!</h1>
-          <p>You may now add components and start building.</p>
-          <p>We&apos;ve already added the button component for you.</p>
-          <Button className="mt-2">Button</Button>
+    <main className="mx-auto max-w-7xl px-4 py-6 flex flex-col gap-6">
+      <ListingFilters categories={categories} />
+
+      {listingsResult.content.length === 0 ? (
+        <div className="py-24 text-center text-muted-foreground">
+          Nenhum anúncio encontrado.
         </div>
-        <div className="text-muted-foreground font-mono text-xs">
-          (Press <kbd>d</kbd> to toggle dark mode)
+      ) : (
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+          {listingsResult.content.map((listing) => (
+            <ListingCard key={listing.id} listing={listing} />
+          ))}
         </div>
-      </div>
-    </div>
+      )}
+
+      {listingsResult.totalPages > 1 && (
+        <ListingsPagination
+          currentPage={listingsResult.number}
+          totalPages={listingsResult.totalPages}
+        />
+      )}
+    </main>
   )
 }
