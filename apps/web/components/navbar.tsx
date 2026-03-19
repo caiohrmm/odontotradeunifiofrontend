@@ -4,6 +4,7 @@ import Link from "next/link"
 import { LogOut, Plus } from "lucide-react"
 import { useAuth } from "@/contexts/auth-context"
 import { Button } from "@workspace/ui/components/button"
+import { MobileSidebarNav } from "@/components/mobile-sidebar-nav"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -22,6 +23,10 @@ export function Navbar() {
   return (
     <header className="sticky top-0 z-40 border-b bg-background">
       <div className="mx-auto flex h-14 max-w-7xl items-center gap-4 px-4">
+        <div className="flex items-center gap-3 md:hidden">
+          <MobileSidebarNav />
+        </div>
+
         <Link href="/" className="text-lg font-semibold tracking-tight">
           OdontoTrade
         </Link>

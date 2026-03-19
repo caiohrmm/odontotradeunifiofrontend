@@ -5,6 +5,8 @@ import "@workspace/ui/globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import { AuthProvider } from "@/contexts/auth-context"
 import { ConditionalNavbar } from "@/components/conditional-navbar"
+import { SidebarNav } from "@/components/sidebar-nav"
+import { Footer } from "@/components/footer"
 import { cn } from "@workspace/ui/lib/utils";
 
 const fontSans = Geist({
@@ -31,9 +33,15 @@ export default function RootLayout({
       <body>
         <ThemeProvider>
           <AuthProvider>
-            <ConditionalNavbar />
-            {children}
-            <Toaster richColors position="bottom-right" />
+            <div className="min-h-screen flex flex-col">
+              <ConditionalNavbar />
+              <div className="flex flex-1">
+                <SidebarNav />
+                <main className="flex-1">{children}</main>
+              </div>
+              <Footer />
+              <Toaster richColors position="bottom-right" />
+            </div>
           </AuthProvider>
         </ThemeProvider>
       </body>
