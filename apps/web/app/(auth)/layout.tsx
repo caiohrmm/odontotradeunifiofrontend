@@ -24,9 +24,9 @@ export default function AuthLayout({
         </div>
 
         <div className="flex gap-6 text-white/70 text-sm">
-          <span>🦷 Instrumentais</span>
-          <span>🧪 Materiais</span>
-          <span>⚙️ Equipamentos</span>
+          <span>Instrumentais</span>
+          <span>Materiais</span>
+          <span>Equipamentos</span>
         </div>
       </div>
 

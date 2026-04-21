@@ -45,7 +45,7 @@ const FEATURES = [
   {
     icon: Syringe,
     title: "Anestesia",
-    desc: "Seringas carpule, agulhas e carpules de anestésicos.",
+    desc: "Seringas carpule, agulhas e tubetes de anestésicos.",
   },
   {
     icon: Package,
