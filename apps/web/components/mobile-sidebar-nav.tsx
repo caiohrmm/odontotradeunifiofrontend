@@ -7,7 +7,7 @@ import { Menu, X } from "lucide-react"
 import { useAuth } from "@/contexts/auth-context"
 import { cn } from "@workspace/ui/lib/utils"
 
-const AUTH_PATHS = ["/login", "/register"]
+const AUTH_PATHS = ["/login", "/register", "/"]
 
 type NavItem = {
   href: string
@@ -16,7 +16,7 @@ type NavItem = {
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { href: "/", label: "Início" },
+  { href: "/feed", label: "Início", requiresAuth: true },
   { href: "/listings/new", label: "Novo anúncio", requiresAuth: true },
   { href: "/profile", label: "Meus anúncios", requiresAuth: true },
   { href: "/profile/edit", label: "Editar perfil", requiresAuth: true },
@@ -32,7 +32,7 @@ export function MobileSidebarNav() {
   const { user } = useAuth()
   const [open, setOpen] = useState(false)
 
-  const isAuthPage = AUTH_PATHS.some((p) => pathname.startsWith(p))
+  const isAuthPage = AUTH_PATHS.some((p) => p === "/" ? pathname === "/" : pathname.startsWith(p))
   if (isAuthPage) return null
 
   const allowedItems = NAV_ITEMS.filter((item) =>

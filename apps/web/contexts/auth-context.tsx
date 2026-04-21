@@ -47,7 +47,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     document.cookie = "auth_token=; path=/; max-age=0; SameSite=Lax"
   }
 
-  async function login(email: string, password: string, redirectTo = "/") {
+  async function login(email: string, password: string, redirectTo = "/feed") {
     const data = await authApi.login(email, password)
     persistSession(data)
     setUser(data)
@@ -58,13 +58,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const data = await authApi.register(name, email, password)
     persistSession(data)
     setUser(data)
-    router.push("/")
+    router.push("/feed")
   }
 
   function logout() {
     clearSession()
     setUser(null)
-    router.push("/login")
+    router.push("/")
   }
 
   function updateUser(updates: Partial<Pick<AuthResponse, "name" | "email">>) {

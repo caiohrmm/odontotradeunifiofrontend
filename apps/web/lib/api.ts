@@ -81,13 +81,17 @@ export async function apiFetch<T>(
     },
   })
 
-  const body: ApiResponse<T> = await res.json()
+  if (res.status === 204) {
+    return null as any
+  }
+
+  const body = await res.json()
 
   if (!res.ok) {
     throw new Error(body.message ?? "Erro na requisição")
   }
 
-  return body.data
+  return body.data !== undefined ? body.data : body
 }
 
 // Server-side fetch — sem localStorage, usado em Server Components
@@ -97,9 +101,11 @@ async function serverFetch<T>(path: string, options: RequestInit = {}): Promise<
     headers: { "Content-Type": "application/json", ...options.headers },
     cache: "no-store",
   })
-  const body: ApiResponse<T> = await res.json()
+  if (res.status === 204) return null as any
+  
+  const body = await res.json()
   if (!res.ok) throw new Error(body.message ?? "Erro na requisição")
-  return body.data
+  return body.data !== undefined ? body.data : body
 }
 
 export interface ListingParams {
@@ -224,4 +230,40 @@ export const authApi = {
       body: JSON.stringify({ name, email, password }),
     })
   },
+}
+
+export interface ChatMessage {
+  id?: string
+  roomId: string
+  senderId: string
+  content: string
+  createdAt?: string
+}
+
+export interface ChatRoom {
+  id: string
+  listingId: string
+  listingTitle?: string
+  buyerId: string
+  sellerId: string
+  createdAt: string
+  listing?: ListingSummaryResponse
+  messages?: ChatMessage[]
+}
+
+export const chatApi = {
+  createOrGetRoom(listingId: string, buyerId: string) {
+    return apiFetch<ChatRoom>(`/api/v1/chat/rooms?listingId=${listingId}&buyerId=${buyerId}`, {
+      method: "POST"
+    })
+  },
+  getRoomMessages(roomId: string) {
+    return apiFetch<ChatMessage[]>(`/api/v1/chat/rooms/${roomId}/messages`)
+  },
+  getUserRooms(userId: string) {
+    return apiFetch<ChatRoom[]>(`/api/v1/chat/rooms/user/${userId}`)
+  },
+  deleteRoom(roomId: string) {
+    return apiFetch<null>(`/api/v1/chat/rooms/${roomId}`, { method: "DELETE" })
+  }
 }

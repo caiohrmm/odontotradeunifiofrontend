@@ -1,25 +1,25 @@
 import { notFound } from "next/navigation"
 import Link from "next/link"
-import { ArrowLeft, Tag, User } from "lucide-react"
+import { ArrowLeft, Tag, User, CalendarDays } from "lucide-react"
 import { listingsApi } from "@/lib/api"
 import { ListingImageGallery } from "@/components/listing-image-gallery"
 import { EditListingButton } from "@/components/edit-listing-button"
-import { Button } from "@workspace/ui/components/button"
+import { ContactButton } from "@/components/contact-button"
 
 type Params = Promise<{ id: string }>
 
 const STATUS_LABEL: Record<string, { label: string; className: string }> = {
   ACTIVE: {
-    label: "Disponivel",
-    className: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
+    label: "Disponível",
+    className: "bg-emerald-50 text-emerald-700 border border-emerald-200",
   },
   RESERVED: {
     label: "Reservado",
-    className: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400",
+    className: "bg-amber-50 text-amber-700 border border-amber-200",
   },
   SOLD: {
     label: "Vendido",
-    className: "bg-muted text-muted-foreground",
+    className: "bg-muted text-muted-foreground border border-border",
   },
 }
 
@@ -44,14 +44,15 @@ export default async function ListingDetailPage({ params }: { params: Params }) 
     notFound()
   }
 
-  const status = STATUS_LABEL[listing.status] ?? STATUS_LABEL.ACTIVE
+  const status = STATUS_LABEL[listing.status] ?? STATUS_LABEL["ACTIVE"]!
+
   const isSold = listing.status === "SOLD"
 
   return (
     <main className="mx-auto max-w-5xl px-4 py-6">
       <Link
         href="/"
-        className="mb-6 inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
+        className="mb-6 inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
       >
         <ArrowLeft className="size-4" />
         Voltar para anúncios
@@ -63,66 +64,78 @@ export default async function ListingDetailPage({ params }: { params: Params }) 
 
         {/* Informações */}
         <div className="flex flex-col gap-5">
+          {/* Título + status + editar */}
           <div className="flex flex-col gap-2">
             <div className="flex items-start justify-between gap-2">
-              <h1 className="text-2xl font-semibold leading-snug">{listing.title}</h1>
+              <h1 className="text-2xl font-bold leading-snug text-foreground">{listing.title}</h1>
               <div className="flex shrink-0 items-center gap-2">
-                <span
-                  className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${status.className}`}
-                >
+                <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${status.className}`}>
                   {status.label}
                 </span>
-                <EditListingButton
-                  listingId={listing.id}
-                  sellerId={listing.sellerId}
-                />
+                <EditListingButton listingId={listing.id} sellerId={listing.sellerId} />
               </div>
             </div>
 
-            <p className="text-3xl font-bold">
+            {/* Preço em destaque teal */}
+            <p className="text-4xl font-bold text-primary">
               {priceFormatter.format(Number(listing.price))}
             </p>
           </div>
 
+          {/* Categoria */}
           {listing.categoryName && (
-            <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-              <Tag className="size-3.5" />
+            <div className="inline-flex items-center gap-1.5 self-start rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+              <Tag className="size-3" />
               {listing.categoryName}
             </div>
           )}
 
+          {/* Separador */}
+          <div className="h-px bg-border/60" />
+
+          {/* Descrição */}
           {listing.description && (
-            <div className="flex flex-col gap-1.5">
-              <h2 className="text-sm font-medium">Descricao</h2>
+            <div className="flex flex-col gap-2">
+              <h2 className="text-sm font-semibold text-foreground">Descrição</h2>
               <p className="whitespace-pre-wrap text-sm text-muted-foreground leading-relaxed">
                 {listing.description}
               </p>
             </div>
           )}
 
+          {/* Vendedor */}
           <Link
             href={`/users/${listing.sellerId}`}
-            className="rounded-lg border p-4 flex items-center gap-3 hover:bg-muted/50 transition-colors"
+            className="rounded-xl border border-border/60 bg-white p-4 flex items-center gap-3 hover:border-primary/30 hover:bg-primary/5 transition-colors"
           >
-            <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-muted">
-              <User className="size-4 text-muted-foreground" />
+            <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+              <User className="size-4.5" />
             </div>
             <div className="flex flex-col gap-0.5">
-              <span className="text-xs text-muted-foreground">Vendido por</span>
-              <span className="text-sm font-medium">{listing.sellerName}</span>
+              <span className="text-xs text-muted-foreground">Anunciado por</span>
+              <span className="text-sm font-semibold text-foreground">{listing.sellerName}</span>
             </div>
           </Link>
 
-          <Button className="w-full" size="lg" disabled={isSold}>
-            {isSold ? "Anuncio encerrado" : "Entrar em contato"}
-          </Button>
+          {/* CTA */}
+          <ContactButton
+            sellerId={listing.sellerId}
+            sellerName={listing.sellerName}
+            listingId={listing.id}
+            listingTitle={listing.title}
+            disabled={isSold}
+          />
 
-          <p className="text-xs text-muted-foreground">
-            Publicado em {dateFormatter.format(new Date(listing.createdAt))}
-            {listing.updatedAt !== listing.createdAt && (
-              <> &middot; Atualizado em {dateFormatter.format(new Date(listing.updatedAt))}</>
-            )}
-          </p>
+          {/* Data */}
+          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+            <CalendarDays className="size-3.5" />
+            <span>
+              Publicado em {dateFormatter.format(new Date(listing.createdAt))}
+              {listing.updatedAt !== listing.createdAt && (
+                <> &middot; Atualizado em {dateFormatter.format(new Date(listing.updatedAt))}</>
+              )}
+            </span>
+          </div>
         </div>
       </div>
     </main>
