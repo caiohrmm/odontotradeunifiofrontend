@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
-import { ImageOff, Pencil, Settings, Trash2 } from "lucide-react"
+import { ImageOff, Pencil, Settings, Trash2, MessageCircle } from "lucide-react"
 import { toast } from "sonner"
 import { useAuth } from "@/contexts/auth-context"
 import { listingsApi, type ListingSummaryResponse } from "@/lib/api"
@@ -221,12 +221,20 @@ export default function ProfilePage() {
             </span>
           </div>
         </div>
-        <Button asChild variant="outline" size="sm" className="shrink-0">
-          <Link href="/profile/edit">
-            <Settings className="size-4" />
-            Editar perfil
-          </Link>
-        </Button>
+        <div className="flex flex-col gap-2 shrink-0">
+          <Button asChild variant="outline" size="sm">
+            <Link href="/profile/edit">
+              <Settings className="size-4" />
+              Editar perfil
+            </Link>
+          </Button>
+          <Button asChild variant="outline" size="sm">
+            <Link href="/profile/chats">
+              <MessageCircle className="size-4" />
+              Minhas Conversas
+            </Link>
+          </Button>
+        </div>
       </div>
 
       {/* Anuncios */}

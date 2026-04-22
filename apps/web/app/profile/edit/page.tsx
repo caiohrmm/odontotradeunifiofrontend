@@ -73,7 +73,7 @@ function ProfileForm() {
               type="email"
               required
               maxLength={255}
-              placeholder="seu@unifio.edu.br"
+              placeholder="seu@email.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
